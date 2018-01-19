@@ -16,7 +16,7 @@ namespace Animation
         
         // Random number generator
         public static Random _rnd = new Random();
-
+        
         // Constants for Window dimensions and ARGB values
         private const int MAX_ROWS = 1000;
         private const int MAX_COLS = 1000;
