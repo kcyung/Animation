@@ -57,6 +57,7 @@
     <Compile Include="Fungus.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shapes.cs" />
     <EmbeddedResource Include="Animation.resx">
       <DependentUpon>Animation.cs</DependentUpon>
     </EmbeddedResource>

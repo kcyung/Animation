@@ -14,22 +14,22 @@ namespace Animation
         // Color Enumerator 
         public enum Colors { Red, Green, Blue, Yellow };
         
-        // Random number generator
+        // Random number generator - for shuffling algorithm
         public static Random _rnd = new Random();
         
         // Constants for Window dimensions and ARGB values
-        private const int MAX_ROWS = 1000;
-        private const int MAX_COLS = 1000;
-        private const int BASE_ARG = 32;
-        private const int INCREMENTAL_ARG = 16;
+        public const int MAX_ROWS = 1000;
+        public const int MAX_COLS = 1000;
+        private const int BASE_ARGB = 32;
+        private const int INCREMENTAL_ARGB = 16;
         private const int MAX_ARG = 255;
 
         // Dictionary to hold each cell's color intensity
         private Dictionary<Point, int> _CellFillColor = new Dictionary<Point, int>();
 
         private Point _current = new Point(0, 0);   // Current location of fungus
-        private CDrawer _canvas = null;     // Canvas for drawer to paint on
-        private Colors _color;              // Color of fungus     
+        private CDrawer _canvas = null;             // Canvas for drawer to paint on
+        private Colors _color;                      // Color of fungus     
         
         // Constructor
         public Fungus(Point StartingPoint, CDrawer canvas, Colors color)
@@ -38,10 +38,9 @@ namespace Animation
             _current = StartingPoint;
             _canvas = canvas;
             _color = color;
-            
+
             // Start a new thread for fungus operation
-            Thread thread  = new Thread(StartFungus);
-            thread.IsBackground = true;
+            Thread thread = new Thread(StartFungus) { IsBackground = true };
             thread.Start();
         }
 
@@ -49,26 +48,22 @@ namespace Animation
         private void StartFungus()
         {
             List<Point> AdjacentPoints;         // List of points of neighbouring cells that are inbounds
-            List<KeyValuePair<Point, int>> sortedLowestIntensity;    // Sorted list of points by lowest color intensity value
 
             while (true)
             {
                 // Get a shuffled list of neighbouring cells that are in bounds
                 AdjacentPoints = ShufflePointList(AvailableMoves());
 
-                // Sort the list of neighbours by lowest color intensity value
-                sortedLowestIntensity = AdjacentPoints.ToDictionary(
-                    o => o, o => _CellFillColor.ContainsKey(o) ? _CellFillColor[o] : 0).ToList();
-                sortedLowestIntensity = sortedLowestIntensity.OrderBy((kvp) => kvp.Value).ToList();
-
-                // Select cell with lowest intensity value, increase intensity and display it on the canvas
-                _current = sortedLowestIntensity.First().Key;
+                // Sort the neighbouring cells by color intensity and select the lowest value for next point to travel to
+                _current = (from point in AdjacentPoints
+                            orderby ((_CellFillColor.ContainsKey(point)) ? _CellFillColor[point] : 0)
+                            select point).First();
 
                 if (!_CellFillColor.ContainsKey(_current))
-                     _CellFillColor.Add(_current, BASE_ARG);
+                     _CellFillColor.Add(_current, BASE_ARGB);
                 else
                     _CellFillColor[_current] =
-                        _CellFillColor[_current] + INCREMENTAL_ARG > 255 ? 255 : _CellFillColor[_current] + INCREMENTAL_ARG;
+                        _CellFillColor[_current] + INCREMENTAL_ARGB > 255 ? 255 : _CellFillColor[_current] + INCREMENTAL_ARGB;
 
                 switch (_color)
                 {
@@ -86,7 +81,7 @@ namespace Animation
                         break;
                 }
 
-                Thread.Sleep(1);
+                Thread.Sleep(0);
             }
         }
 
